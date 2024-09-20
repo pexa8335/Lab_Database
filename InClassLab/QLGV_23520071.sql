@@ -1,0 +1,126 @@
+﻿
+CREATE TABLE KHOA
+( 
+	MAKHOA varchar(4) NOT NULL PRIMARY KEY,
+	TENKHOA varchar(40),
+	NGTLAP smalldatetime,
+	TRGKHOA char(4),
+)
+
+ALTER TABLE KHOA
+ADD FOREIGN KEY (TRGKHOA) REFERENCES GIAOVIEN(MAGV)
+
+ALTER TABLE KHOA
+ALTER COLUMN TRGKHOA char(4) NOT NULL
+
+CREATE TABLE MONHOC
+(
+	MAMH varchar(10) NOT NULL PRIMARY KEY,
+	TENMH varchar(40),
+	TCLT tinyint,
+	TCTH tinyint,
+	MAKHOA varchar(4),
+	FOREIGN KEY (MAKHOA) REFERENCES KHOA(MAKHOA)
+)
+
+CREATE TABLE GIAOVIEN 
+(
+	MAGV char(4) NOT NULL PRIMARY KEY,
+	HOTEN varchar(40),
+	HOCVI varchar(10),
+	HOCHAM varchar(10),
+	GIOITINH varchar(3),
+	NGSINH smalldatetime,
+	NGVL smalldatetime,
+	HESO numeric(4,2),
+	MUCLUONG money,
+	MAKHOA varchar(4),
+	FOREIGN KEY (MAKHOA) REFERENCES KHOA(MAKHOA)
+)
+--3 Thuộc tính GIOITINH chỉ có giá trị là “Nam” hoặc “Nu”.
+ALTER TABLE GIAOVIEN
+ADD CONSTRAINT GIOITINH CHECK (GIOITINH IN('Nam', 'Nu'))
+
+--8 Học vị của giáo viên chỉ có thể là “CN”, “KS”, “Ths”, ”TS”, ”PTS”.
+ALTER TABLE GIAOVIEN
+ADD CONSTRAINT HOCVI CHECK (HOCVI IN ('CN', 'KS', 'Ths', 'TS', 'PTS'))
+
+CREATE TABLE DIEUKIEN
+(
+	MAMH varchar(10) NOT NULL,
+	MAMH_TRUOC varchar(10) NOT NULL,
+	PRIMARY KEY (MAMH, MAMH_TRUOC),
+	FOREIGN KEY (MAMH) REFERENCES MONHOC(MAMH),
+	FOREIGN KEY (MAMH_TRUOC) REFERENCES MONHOC(MAMH)
+)
+
+CREATE TABLE LOP
+(
+	MALOP char(3) NOT NULL PRIMARY KEY,
+	TENLOP varchar(40),
+	TRGLOP char(5),
+	SISO tinyint,
+	MAGVCN char(4),
+	FOREIGN KEY (MAGVCN) REFERENCES GIAOVIEN(MAGV)
+)
+
+CREATE TABLE HOCVIEN
+(
+	MAHV char(5) NOT NULL PRIMARY KEY,
+	HO varchar(40),
+	TEN varchar(10),
+	NGSINH smalldatetime,
+	GIOITINH varchar(3),
+	NOISINH varchar(40),
+	MALOP char(3),
+	FOREIGN KEY (MALOP) REFERENCES LOP(MALOP)
+)
+--3 Thuộc tính GIOITINH chỉ có giá trị là “Nam” hoặc “Nu”.
+ALTER TABLE HOCVIEN
+ADD CONSTRAINT GIOITINH CHECK (GIOITINH IN('Nam', 'Nu'))
+
+CREATE TABLE GIANGDAY
+(
+	MALOP char(3) NOT NULL,
+	MAMH varchar(10) NOT NULL,
+	MAGV char(4),
+	HOCKY tinyint,
+	NAM smallint,
+	TUNGAY smalldatetime,
+	DENNGAY smalldatetime,
+	PRIMARY KEY (MALOP, MAMH),
+	FOREIGN KEY (MAGV) REFERENCES GIAOVIEN(MAGV)
+)
+--7 Học kỳ chỉ có giá trị từ 1 đến 3.
+ALTER TABLE GIANGDAY
+ADD CONSTRAINT HOCKY CHECK (HOCKY >= 1 AND HOCKY <= 3)
+
+CREATE TABLE KETQUATHI
+(
+	MAHV char(5) NOT NULL,
+	MAMH varchar(10) NOT NULL,
+	LANTHI tinyint NOT NULL,
+	NGTHI smalldatetime,
+	DIEM numeric (4,2),
+	KQUA varchar(10),
+	PRIMARY KEY (MAHV, MAMH, LANTHI),
+	FOREIGN KEY (MAHV) REFERENCES HOCVIEN(MAHV),
+	FOREIGN KEY (MAMH) REFERENCES MONHOC(MAMH)
+)
+--5 Kết quả thi là “Dat” nếu điểm từ 5 đến 10 và “Khong dat” nếu điểm nhỏ hơn 5.
+ALTER TABLE KETQUATHI
+ADD CONSTRAINT KQUA CHECK (
+(DIEM >= 5 AND DIEM <= 10 AND KQUA = 'Dat') OR
+(DIEM <= 5 AND DIEM >= 0 AND KQUA = 'Khong dat'))
+
+--4 Điểm số của một lần thi có giá trị từ 0 đến 10 và cần lưu đến 2 số lẽ (VD: 6.22).
+ALTER TABLE KETQUATHI
+ALTER COLUMN DIEM numeric (4,2)
+--4 Điểm số của một lần thi có giá trị từ 0 đến 10 và cần lưu đến 2 số lẽ (VD: 6.22).
+ALTER TABLE KETQUATHI
+ADD CONSTRAINT DIEM CHECK (DIEM <= 10.0 AND DIEM >= 0.0)
+
+--6 Học viên thi một môn tối đa 3 lần.
+ALTER TABLE KETQUATHI
+ADD CONSTRAINT LANTHI CHECK (LANTHI <= 3)
+
