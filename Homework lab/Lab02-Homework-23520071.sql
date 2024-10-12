@@ -142,52 +142,54 @@ HAVING COUNT(MaDuAn) > 1
 ORDER BY SL_DuAn_DangThucHien DESC;
 
 -- Tìm kiếm các kỹ năng mà chuyên gia có cấp độ từ 4 trở lên và tính tổng số chuyên gia cho mỗi kỹ năng đó. Chỉ bao gồm những kỹ năng có tổng số chuyên gia lớn hơn 2. Sắp xếp kết quả theo tên kỹ năng tăng dần
-SELECT CGKN.MaKyNang, KN.TenKyNang, COUNT(MaChuyenGia) AS TongChuyenGia
-FROM KyNang KN
-JOIN ChuyenGia_KyNang CGKN ON CGKN.MaKyNang = KN.MaKyNang
-WHERE CGKN.CapDo >= 4
-GROUP BY CGKN.MaKyNang, KN.TenKyNang
+SELECT COUNT(MaChuyenGia) AS TongChuyenGia, TenKyNang
+FROM ChuyenGia_KyNang CGKN
+JOIN KyNang KN ON CGKN.MaKyNang = KN.MaKyNang
+WHERE CapDo > 3
+GROUP BY TenKyNang
 HAVING COUNT(MaChuyenGia) > 2
-ORDER BY KN.TenKyNang ASC
+ORDER BY TenKyNang ASC
 
 -- Liệt kê tên các công ty có lĩnh vực 'Điện toán đám mây' và tính tổng số nhân viên của họ. Sắp xếp kết quả theo tổng số nhân viên tăng dần.
-SELECT TenCongTy, SUM(SoNhanVien) AS TongNhanVien, LinhVuc
+SELECT SUM(SoNhanVien) AS TongNhanVien, TenCongTy
 FROM CongTy
 WHERE LinhVuc = N'Điện toán đám mây'
-GROUP BY TenCongTy, LinhVuc
+GROUP BY TenCongTy
 ORDER BY SUM(SoNhanVien) ASC
-
 -- Liệt kê tên các công ty có số nhân viên từ 50 đến 150 và tính trung bình số nhân viên của họ. Sắp xếp kết quả theo tên công ty tăng dần.
-SELECT AVG(SoNhanVien) AS AVG_NV, TenCongTy
+SELECT TenCongTy, AVG(SoNhanVien) AS TrungBinhSoNhanVien
 FROM CongTy
 WHERE SoNhanVien BETWEEN 50 AND 150
-GROUP BY TenCongTy 
+GROUP BY TenCongTy
 ORDER BY TenCongTy ASC
 
 -- Xác định số lượng kỹ năng cho mỗi chuyên gia có cấp độ tối đa là 5 và chỉ bao gồm những chuyên gia có ít nhất một kỹ năng đạt cấp độ tối đa này. Sắp xếp kết quả theo tên chuyên gia tăng dần.
-SELECT cg.MaChuyenGia, COUNT(MaKyNang) AS KyNangCoCapDo5, cg.HoTen
-FROM CHUYENGIA_KYNANG cgkn
-JOIN ChuyenGia cg ON cg.MaChuyenGia = cgkn.MaChuyenGia
+SELECT COUNT(CGKN.MaKyNang) AS SL_KyNangCap5, HoTen
+FROM ChuyenGia CG
+JOIN ChuyenGia_KyNang CGKN ON CGKN.MaChuyenGia = CG.MaChuyenGia
 WHERE CapDo = 5
-GROUP BY cg.MaChuyenGia, cg.HoTen
-ORDER BY cg.HoTen
+GROUP BY HoTen
+HAVING COUNT(CGKN.MaKyNang) > 0
+ORDER BY HoTen ASC
+
 -- Liệt kê tên các kỹ năng mà chuyên gia có cấp độ từ 4 trở lên và tính tổng số chuyên gia cho mỗi kỹ năng đó. Chỉ bao gồm những kỹ năng có tổng số chuyên gia lớn hơn 2. Sắp xếp kết quả theo tên kỹ năng tăng dần.
-SELECT COUNT (MaChuyenGia) AS TongChuyenGia, kn.TenKyNang
-FROM ChuyenGia_KyNang cgkn
-JOIN KyNang kn ON kn.MaKyNang = cgkn.MaKyNang
+SELECT TenKyNang, COUNT(CGKN.MaChuyenGia) AS TongChuyenGia
+FROM ChuyenGia_KyNang CGKN
+JOIN KyNang KN ON KN.MaKyNang = CGKN.MaKyNang
 WHERE CapDo > 3
-GROUP BY kn.TenKyNang
-HAVING COUNT(MaChuyenGia) > 2
-ORDER BY kn.TenKyNang ASC
+GROUP BY TenKyNang
+HAVING COUNT(CGKN.MaChuyenGia) > 2
+ORDER BY TenKyNang ASC
 
 -- Tìm kiếm tên của các chuyên gia trong lĩnh vực 'Phát triển phần mềm' và tính trung bình cấp độ kỹ năng của họ. Chỉ bao gồm những chuyên gia có cấp độ trung bình lớn hơn 3. Sắp xếp kết quả theo cấp độ trung bình giảm dần.
-SELECT AVG(CapDo) AS AVG_CAPDO, HoTen
-FROM ChuyenGia cg
-JOIN ChuyenGia_KyNang cgkn ON cgkn.MaChuyenGia = cg.MaChuyenGia
-WHERE ChuyenNganh = N'Phát triển phần mềm'
+--Lĩnh vực của công ty, chuyên ngành của chuyên gia nên em đổi lại where chuyên gia =...
+SELECT HoTen, AVG(CapDo) AS TB_CapDo
+FROM ChuyenGia CG
+JOIN ChuyenGia_KyNang CGKN ON CGKN.MaChuyenGia = CG.MaChuyenGia
+WHERE ChuyenNganh = N'Phát triển phần mềm' 
 GROUP BY HoTen
 HAVING AVG(CapDo) > 3
-ORDER BY AVG (CapDo) DESC
+ORDER BY AVG(CapDo) DESC
 
 
 
