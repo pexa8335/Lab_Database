@@ -283,13 +283,3 @@ WHERE hv.MALOP LIKE 'K__'
 AND kq.MAMH = 'CTRR' 
 AND kq.KQUA = 'Khong Dat'
 
---III. Ngôn ngữ truy vấn dữ liệu (CÂU 1-5)
---1 In ra danh sách (mã học viên, họ tên, ngày sinh, mã lớp) lớp trưởng của các lớp.
-
---2 In ra bảng điểm khi thi (mã học viên, họ tên, lần thi, điểm số) môn CTRR của lớp “K12”, sắp xếp theo tên, họ học viên.
-
---3 In ra danh sách những học viên (mã học viên, họ tên) và những môn học mà học viên đó thi lần thứ nhất đã đạt.
-
---4 In ra danh sách học viên (mã học viên, họ tên) của lớp “K11” thi môn CTRR không đạt (ở lần thi 1).
-
---5 * Danh sách học viên (mã học viên, họ tên) của lớp “K” thi môn CTRR không đạt (ở tất cả các lần thi).
